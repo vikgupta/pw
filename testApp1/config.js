@@ -27,7 +27,19 @@
             token: 'token='
         },
         encoding: 'hex',
-        digest: 'sha1'
+        digest: 'sha1',
+        crypto: {
+            algo: 'aes-256-cbc',
+            encode: {
+                inputEncoding: 'ascii',
+                outputEncoding: 'hex'
+            },
+            decode: {
+                inputEncoding: 'hex',
+                outputEncoding: 'ascii'
+            },
+            symmetricKey: 'This is such a dumb-ass symmetric key!!! :)'
+        }
     },
     staging: {
     	environment: {
@@ -53,7 +65,19 @@
         }
         ,
         encoding: 'hex',
-        digest: 'sha1'
+        digest: 'sha1',
+        crypto: {
+            algo: 'aes-256-cbc',
+            encode: {
+                inputEncoding: 'ascii',
+                outputEncoding: 'hex'
+            },
+            decode: {
+                inputEncoding: 'hex',
+                outputEncoding: 'ascii'
+            },
+            symmetricKey: 'P@$TE'
+        }
     },
     production: {
     	environment: {
@@ -78,7 +102,19 @@
             token: 'token'
         },
         encoding: 'hex',
-        digest: 'sha1'
+        digest: 'sha1',
+        crypto: {
+            algo: 'aes-256-cbc',
+            encode: {
+                inputEncoding: 'ascii',
+                outputEncoding: 'hex'
+            },
+            decode: {
+                inputEncoding: 'hex',
+                outputEncoding: 'ascii'
+            },
+            symmetricKey: 'P@$TE'
+        }
     }
 };
 

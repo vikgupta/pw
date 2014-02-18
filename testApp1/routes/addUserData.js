@@ -6,6 +6,7 @@
 var mongoose = require('mongoose');
 var userInformationModel = require('../models/userDataModel');
 var config = require('../config')();
+var crypto = require('crypto');
 
 exports.controller = function(app) {
 
@@ -19,9 +20,25 @@ exports.controller = function(app) {
 			var base64DecodedData = new Buffer(req.headers.userdata).toString('base64');
 		}*/
 
-		// Get the data from headers
-		var useridentifier = req.headers.useridentifier;
-		var data = req.headers.userdata;
+		// Get the key that was used to encrypt the data
+		var encodedKey = new Buffer(req.body.key).toString();
+		var keyDecipher = crypto.createDecipher(config.crypto.algo, config.crypto.symmetricKey);
+		var clearKey = keyDecipher.update(encodedKey, config.crypto.decode.inputEncoding, config.crypto.decode.outputEncoding);
+		clearKey += keyDecipher.final(config.crypto.decode.outputEncoding);
+
+		// Get the decrypted data
+		var encryptedData = new Buffer(req.body.data).toString();
+		var dataDecipher = crypto.createDecipher(config.crypto.algo, clearKey);
+		var clearData = dataDecipher.update(encryptedData, config.crypto.decode.inputEncoding, config.crypto.decode.outputEncoding);
+		clearData += dataDecipher.final(config.crypto.decode.outputEncoding);
+
+		// Get the base 64 decoded data
+		var decodedData = new Buffer(clearData, 'base64').toString();
+
+		// Get the identifier and data
+		var jsonData = JSON.parse(decodedData);
+		var useridentifier = jsonData.userIdentifier;
+		var data = jsonData.userData;
 
 		// Add / update the data
 		var datamodel = null;

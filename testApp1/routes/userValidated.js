@@ -11,7 +11,6 @@ var crypto = require('crypto');
 exports.controller = function(app) {
 	app.post('/userValidated', function(req, res){
 		var urlString = config.rpxnow.url + config.rpxnow.apiKey + config.rpxnow.apiKeyString + '&' + config.rpxnow.token + req.body.token;
-		//console.log(urlString);
 
 		https.get(urlString, function(result){
 			console.log(result.statusCode);
@@ -21,8 +20,6 @@ exports.controller = function(app) {
 
 				var shasum = crypto.createHash(config.digest);
 				var identifierString = shasum.update(obj.profile.identifier).digest(config.encoding);
-
-				//res.send(obj.profile.identifier);
 				var currentUserModel = userInformationModel.find({identifier: identifierString}).exec(function(err, docs) {
 					if(err || docs == null || docs[0] == null)
 					{

@@ -4,41 +4,59 @@
  */
 
 var mongoose = require('mongoose');
-var userDataModel = require('../models/userDataModel');
+var userInformationModel = require('../models/userDataModel');
+var config = require('../config')();
+var crypto = require('crypto');
 
 exports.controller = function(app) {
 
-	app.get('/getUserData/:id', function(req, res){
+	app.post('/getUserData', function(req, res){
+		// Get the key that was used to encrypt the data
+		var encodedKey = new Buffer(req.body.key).toString();
+		var keyDecipher = crypto.createDecipher(config.crypto.algo, config.crypto.symmetricKey);
+		var clearKey = keyDecipher.update(encodedKey, config.crypto.decode.inputEncoding, config.crypto.decode.outputEncoding);
+		clearKey += keyDecipher.final(config.crypto.decode.outputEncoding);
 
-		if(userDataModel)
-		{
-			var data = req.headers.userdata;
-			if(req.headers.userdatatype != 'Base64Encoded')
+		// Get the decrypted data
+		var encryptedData = new Buffer(req.body.data).toString();
+		var dataDecipher = crypto.createDecipher(config.crypto.algo, clearKey);
+		var clearData = dataDecipher.update(encryptedData, config.crypto.decode.inputEncoding, config.crypto.decode.outputEncoding);
+		clearData += dataDecipher.final(config.crypto.decode.outputEncoding);
+
+		// Get the base 64 decoded data
+		var decodedData = new Buffer(clearData, 'base64').toString();
+
+		// Get the identifier and index
+		var jsonData = JSON.parse(decodedData);
+		var useridentifier = jsonData.userIdentifier;
+		var index = jsonData.dataAtIndex;
+
+		// Get the data
+		var datamodel = null;
+		var currentUserModel = userInformationModel.find({identifier: useridentifier}).exec(function(err, docs) {
+			if(err || docs == null || docs[0] == null)
 			{
-				data = new Buffer(data).toString('base64');
+				res.send('User not found');
 			}
-
-			userDataModel.find({}).sort({date:1}).exec(function(err, docs){
-				docs[0].remove();
-			});
-
-			var datamodel = new userDataModel({dataString: data});
-			datamodel.save(function(err){
-				if(err)
+			else if( docs != null && docs[0] != null )
+			{
+				var offset = docs[0].historyLimit - parseInt(index);
+				if( offset < 0 || isNaN(offset) )
 				{
-					res.send(err);
+					res.send('Invalid index');
 				}
 				else
 				{
-					res.send('Data successfully set');
+					var existingData = docs[0].userData;
+					var dataRequestedByUser = existingData[ offset ].dataString;
+					res.send(dataRequestedByUser);
 				}
-			});
-		}
-		else
-		{
-			res.send('DB couldn\'t be connected');
-		}
-		//res.send(req.params.id);
+			}
+			else
+			{
+				res.send('Some error');
+			}
+		});
 	});
 
 }
