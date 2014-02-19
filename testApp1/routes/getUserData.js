@@ -43,7 +43,9 @@ exports.controller = function(app) {
 				{
 					var existingData = docs[0].userData;
 					var dataRequestedByUser = existingData[ offset ].dataString;
-					res.send(dataRequestedByUser);
+					var encryptedDataForReturn = encryptionManager.symmetricEncryption( dataRequestedByUser, clearKey );
+					var status = "{" + "\"errorCode\":\"" + "0" + "\", \"errorDesc\":\"" + "Success" + "\", \"data\":\"" + encryptedDataForReturn + "\"}";
+					res.send(status);
 				}
 			}
 			else
@@ -54,3 +56,11 @@ exports.controller = function(app) {
 	});
 
 }
+
+/*
+{
+	"errorCode":"0",
+	"errorDesc":"Success",
+	"data":"<data encrypted with the key>"
+}
+*/

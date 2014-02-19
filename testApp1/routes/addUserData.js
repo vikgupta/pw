@@ -69,7 +69,8 @@ exports.controller = function(app) {
 						}
 						else
 						{
-							res.send('Data successfully added');
+							var status = "{" + "\"errorCode\":\"" + "0" + "\", \"errorDesc\":\"" + "Success" + "\"}";
+							res.send(status);
 						}
 					});
 				}
@@ -86,3 +87,10 @@ exports.controller = function(app) {
 	});
 
 }
+
+/*
+{
+	"errorCode":"0",
+	"errorDesc":"Success"
+}
+*/
