@@ -3,7 +3,7 @@
  */
 
 var config = require('../config')();
-var crypto = require('crypto');
+var encryptionManager = require('../common_modules/encryptionWrapper');
 
 exports.controller = function(app) {
 	app.post('/getEncryptedData', function(req, res){
@@ -26,13 +26,8 @@ exports.controller = function(app) {
 		{
 			var clearBase64Data = new Buffer(dataInJSONForm).toString('base64');
 
-			var dataCipher = crypto.createCipher(config.crypto.algo, clearKey);
-			var encData = dataCipher.update(clearBase64Data, config.crypto.encode.inputEncoding, config.crypto.encode.outputEncoding);
-			encData += dataCipher.final(config.crypto.encode.outputEncoding);
-
-			var keyCipher = crypto.createCipher(config.crypto.algo, config.crypto.symmetricKey);
-			var encKey = keyCipher.update(clearKey, config.crypto.encode.inputEncoding, config.crypto.encode.outputEncoding);
-			encKey += keyCipher.final(config.crypto.encode.outputEncoding);
+			var encData = encryptionManager.symmetricEncryption( clearBase64Data, clearKey );
+			var encKey = encryptionManager.symmetricEncryption( clearKey, config.crypto.symmetricKey );
 
 			var jsondata = {"data":encData, "key":encKey};
 			res.send(JSON.stringify(jsondata));

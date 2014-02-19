@@ -76,7 +76,7 @@
                 inputEncoding: 'hex',
                 outputEncoding: 'ascii'
             },
-            symmetricKey: 'P@$TE'
+            symmetricKey: 'This is such a dumb-ass symmetric key!!! :)'
         }
     },
     production: {
@@ -113,7 +113,7 @@
                 inputEncoding: 'hex',
                 outputEncoding: 'ascii'
             },
-            symmetricKey: 'P@$TE'
+            symmetricKey: 'This is such a dumb-ass symmetric key!!! :)'
         }
     }
 };
